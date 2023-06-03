@@ -1,0 +1,66 @@
+﻿using ELibrary_BorrowingService.Application.Command.Exception;
+using ELibrary_BorrowingService.Application.Command.Model;
+using ELibrary_BorrowingService.Domain.Entity;
+using ELibrary_BorrowingService.Domain.Exception;
+using ELibrary_BorrowingService.Domain.Repository;
+
+namespace ELibrary_BorrowingService.Application.Command;
+
+public class BorrowProvider : IBorrowProvider
+{
+    private readonly IBookRepository _bookRepository;
+    private readonly ICustomerRepository _customerRepository;
+
+    public BorrowProvider(IBookRepository bookRepository, ICustomerRepository customerRepository)
+    {
+        _bookRepository = bookRepository;
+        _customerRepository = customerRepository;
+    }
+
+    public async Task Borrow(int bookId, string customerId)
+    {
+        var book = await GetBookOrThrow(bookId);
+        var user = await GetCustomerOrThrow(customerId);
+
+        var borrowing = new BorrowingHistory(book, user);
+        book.Borrow(borrowing);
+
+        await _bookRepository.UpdateAsync(book);
+        //_bus.Publish()
+    }
+
+    public async Task Return(int bookId, string customerId)
+    {
+        var book = await GetBookOrThrow(bookId);
+        try
+        {
+            book.Return(customerId);
+        }
+        catch (OverTimeReturnException ex)
+        {
+            //todo: _bus.publish() OvertimeReturn ex.Message.ToDecimal
+        }
+
+        await _bookRepository.UpdateAsync(book);
+        //_bus.Publish()
+    }
+
+
+    private async Task<Book> GetBookOrThrow(int id)
+    {
+        var book = await _bookRepository.GetAsync(id);
+        if (book is null)
+            throw new EntityNotFoundException("Book has not been found");
+
+        return book;
+    }
+
+    private async Task<Customer> GetCustomerOrThrow(string id)
+    {
+        var user = await _customerRepository.GetAsync(id);
+        if (user is null)
+            throw new EntityNotFoundException("Customer has not been found");
+
+        return user;
+    }
+}
