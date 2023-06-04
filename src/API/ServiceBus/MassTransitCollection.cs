@@ -69,7 +69,7 @@ namespace ELibrary_BorrowingService.RabbitMq
                         cfg.Message<OvertimeReturnU>(cfgTopology => cfgTopology.SetEntityName(nameof(OvertimeReturnU)));
 
                         /// Consumers configuration ///
-                        cfg.ReceiveEndpoint("bookavailabilitychanged", e =>
+                        cfg.ReceiveEndpoint("bookavailabilitychangedbr", e =>
                         {
                             e.ConfigureConsumeTopology = false;     // configuration for ASB Basic Tier - queues only
                             e.PublishFaults = false;
