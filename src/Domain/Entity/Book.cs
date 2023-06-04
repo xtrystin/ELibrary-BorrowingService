@@ -19,9 +19,10 @@ public class Book
     protected Book()
     {
     }
-    public Book(int id)
+    public Book(int id, int availableBooks)
     {
         Id = id;
+        _availabieBooks = availableBooks;
     }
 
     public bool IsAvailable() => _availabieBooks > 0;
@@ -33,6 +34,9 @@ public class Book
         {
             borrowing.Customer.Borrow();
             activeBooking.Unbook(unBookAfterBorrow: true);
+            _borrowingHistory.Add(borrowing);
+
+            throw new BorrowAfterBookingException();
         }
         else if (_availabieBooks <= 0)
         {
@@ -42,9 +46,9 @@ public class Book
         {
             borrowing.Customer.Borrow();
             _availabieBooks--;
+            _borrowingHistory.Add(borrowing);
         }
 
-        _borrowingHistory.Add(borrowing);
     }
 
     public void Return(string customerId) 
@@ -59,7 +63,11 @@ public class Book
         borrowing.Customer.Return();
 
         if (borrowing.IsOverTimeReturn())
-            throw new OverTimeReturnException(_penaltyAmount);
+        {
+            var overtimeDays = borrowing.GetOverTimeDays();
+            var penalty = _penaltyAmount * overtimeDays;
+            throw new OverTimeReturnException(penalty);
+        }
     }
 
     public void BookBook(BookingHistory booking)
@@ -83,4 +91,8 @@ public class Book
         _availabieBooks++;
         booking.Customer.UnBook();
     }
+
+    public void ChangeBookAvailability(int amount) => _availabieBooks += amount;
+
+    public void RemoveBook() => _availabieBooks = -1;
 }

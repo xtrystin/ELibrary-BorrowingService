@@ -1,7 +1,7 @@
 ﻿using ELibrary_BorrowingService.Consumers;
-using ELibrary_UserService.RabbitMq.Messages;
+using ELibrary_BorrowingService.ServiceBus;
 using MassTransit;
-using RabbitMqMessages;
+using ServiceBusMessages;
 
 namespace ELibrary_BorrowingService.RabbitMq
 {
@@ -10,11 +10,31 @@ namespace ELibrary_BorrowingService.RabbitMq
         private const string SubscriptionEndpoint = "BorrowingService";
         public static IServiceCollection AddServiceBus(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddScoped<IMessagePublisher, MessagePublisher>();
+
             services.AddMassTransit(x =>
             {
                 // add consumers
-                x.AddConsumer<UserCreatedConsumer>();
                 x.AddConsumer<BookAvailabilityChangedConsumer>();
+                x.AddConsumer<BookAvailabilityChangedBrConsumer>();
+
+                x.AddConsumer<BookCreatedConsumer>();
+                x.AddConsumer<BookCreatedBrConsumer>();
+
+                x.AddConsumer<BookRemovedConsumer>();
+                x.AddConsumer<BookRemovedBrConsumer>();
+
+                x.AddConsumer<UserBlockedConsumer>();
+                x.AddConsumer<UserBlockedBrConsumer>();
+
+                x.AddConsumer<UserCreatedConsumer>();
+                x.AddConsumer<UserCreatedBrConsumer>();
+
+                x.AddConsumer<UserDeletedConsumer>();
+                x.AddConsumer<UserDeletedBrConsumer>();
+
+                x.AddConsumer<UserUnblockedConsumer>();
+                x.AddConsumer<UserUnblockedBrConsumer>();
 
 
                 if (configuration["Flags:UserRabbitMq"] == "1")   //todo change to preprocessor directive #if
@@ -40,26 +60,65 @@ namespace ELibrary_BorrowingService.RabbitMq
                         cfg.Host(configuration["AzureServiceBusConnectionString"]);
 
                         /// Publisher configuration ///
-
+                        // bookavailabilitychanged
+                        EndpointConvention.Map<BookAvailabilityChangedBk>(new Uri($"queue:{nameof(BookAvailabilityChangedBk)}"));
+                        cfg.Message<BookAvailabilityChangedBk>(cfgTopology => cfgTopology.SetEntityName(nameof(BookAvailabilityChangedBk)));
+                        
+                        // overtimereturn
+                        EndpointConvention.Map<OvertimeReturnU>(new Uri($"queue:{nameof(OvertimeReturnU)}"));
+                        cfg.Message<OvertimeReturnU>(cfgTopology => cfgTopology.SetEntityName(nameof(OvertimeReturnU)));
 
                         /// Consumers configuration ///
-                        // usercreated
-                        cfg.ReceiveEndpoint("usercreated", e =>
-                        {
-                            e.ConfigureConsumeTopology = false;     // configuration for ASB Basic Tier - queues only
-                            e.PublishFaults = false;
-                            e.ConfigureConsumer<UserCreatedConsumer>(context);
-
-                        });
-
-                        // bookavailabilitychanged
                         cfg.ReceiveEndpoint("bookavailabilitychanged", e =>
                         {
                             e.ConfigureConsumeTopology = false;     // configuration for ASB Basic Tier - queues only
                             e.PublishFaults = false;
-                            e.ConfigureConsumer<BookAvailabilityChangedConsumer>(context);
+                            e.ConfigureConsumer<BookAvailabilityChangedBrConsumer>(context);
 
                         });
+                        cfg.ReceiveEndpoint("bookcreatedbr", e =>
+                        {
+                            e.ConfigureConsumeTopology = false;     // configuration for ASB Basic Tier - queues only
+                            e.PublishFaults = false;
+                            e.ConfigureConsumer<BookCreatedBrConsumer>(context);
+
+                        });
+                        cfg.ReceiveEndpoint("bookremovedbr", e =>
+                        {
+                            e.ConfigureConsumeTopology = false;     // configuration for ASB Basic Tier - queues only
+                            e.PublishFaults = false;
+                            e.ConfigureConsumer<BookRemovedBrConsumer>(context);
+
+                        });
+                        cfg.ReceiveEndpoint("userblockedbr", e =>
+                        {
+                            e.ConfigureConsumeTopology = false;     // configuration for ASB Basic Tier - queues only
+                            e.PublishFaults = false;
+                            e.ConfigureConsumer<UserBlockedBrConsumer>(context);
+
+                        });
+                        cfg.ReceiveEndpoint("usercreatedbr", e =>
+                        {
+                            e.ConfigureConsumeTopology = false;     // configuration for ASB Basic Tier - queues only
+                            e.PublishFaults = false;
+                            e.ConfigureConsumer<UserCreatedBrConsumer>(context);
+
+                        });
+                        cfg.ReceiveEndpoint("userdeletedbr", e =>
+                        {
+                            e.ConfigureConsumeTopology = false;     // configuration for ASB Basic Tier - queues only
+                            e.PublishFaults = false;
+                            e.ConfigureConsumer<UserDeletedBrConsumer>(context);
+
+                        });
+                        cfg.ReceiveEndpoint("userunblockedbr", e =>
+                        {
+                            e.ConfigureConsumeTopology = false;     // configuration for ASB Basic Tier - queues only
+                            e.PublishFaults = false;
+                            e.ConfigureConsumer<UserBlockedBrConsumer>(context);
+
+                        });
+
                     });
                 }
 

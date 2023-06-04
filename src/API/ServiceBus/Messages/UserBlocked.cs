@@ -1,7 +1,11 @@
-﻿namespace RabbitMqMessages
+﻿namespace ServiceBusMessages;
+
+public class UserBlocked
 {
-    public class UserBlocked
-    {
-        public string UserId { get; set; }
-    }
+    public string UserId { get; set; }
+}
+
+public class UserBlockedBr
+{
+    public string UserId { get; set; }
 }

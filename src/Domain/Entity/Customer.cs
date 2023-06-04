@@ -45,6 +45,8 @@ public class Customer
     }
     public void Return() => _currentBorrowedBookNr--;
 
-    public void ChangeAccountStatus(bool isAccountBlocked)
+    public void ChangeAccountStatus(bool isAccountBlocked) 
         => _isAccountBlocked = isAccountBlocked;
+
+    public void DeleteCustomer() => (_maxBooksToBook, _maxBooksToBorrow) = (-1, -1);
 }

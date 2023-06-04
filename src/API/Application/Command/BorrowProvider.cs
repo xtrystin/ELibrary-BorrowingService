@@ -1,66 +1,66 @@
-﻿using ELibrary_BorrowingService.Application.Command.Exception;
-using ELibrary_BorrowingService.Application.Command.Model;
+﻿using ELibrary_BorrowingService.Application.Common;
 using ELibrary_BorrowingService.Domain.Entity;
 using ELibrary_BorrowingService.Domain.Exception;
 using ELibrary_BorrowingService.Domain.Repository;
+using ELibrary_BorrowingService.ServiceBus;
+using ServiceBusMessages;
 
 namespace ELibrary_BorrowingService.Application.Command;
 
 public class BorrowProvider : IBorrowProvider
 {
     private readonly IBookRepository _bookRepository;
-    private readonly ICustomerRepository _customerRepository;
+    private readonly ICommonHelpers _commonHelpers;
+    private readonly IMessagePublisher _messagePublisher;
 
-    public BorrowProvider(IBookRepository bookRepository, ICustomerRepository customerRepository)
+    public BorrowProvider(IBookRepository bookRepository, ICommonHelpers commonHelpers,
+        IMessagePublisher messagePublisher)
     {
         _bookRepository = bookRepository;
-        _customerRepository = customerRepository;
+        _commonHelpers = commonHelpers;
+        _messagePublisher = messagePublisher;
     }
 
     public async Task Borrow(int bookId, string customerId)
     {
-        var book = await GetBookOrThrow(bookId);
-        var user = await GetCustomerOrThrow(customerId);
+        var book = await _commonHelpers.GetBookOrThrow(bookId);
+        var user = await _commonHelpers.GetCustomerOrThrow(customerId);
 
         var borrowing = new BorrowingHistory(book, user);
-        book.Borrow(borrowing);
+        try
+        {
+            book.Borrow(borrowing);
+        }
+        catch (BorrowAfterBookingException)
+        {
+            await _bookRepository.UpdateAsync(book);
+            return;
+        }
 
         await _bookRepository.UpdateAsync(book);
-        //_bus.Publish()
+        var availabilityChanged = new BookAvailabilityChanged() { BookId = bookId, Amount = -1 };
+        await _messagePublisher.Publish(availabilityChanged);
     }
 
     public async Task Return(int bookId, string customerId)
     {
-        var book = await GetBookOrThrow(bookId);
+        var book = await _commonHelpers.GetBookOrThrow(bookId);
         try
         {
             book.Return(customerId);
         }
         catch (OverTimeReturnException ex)
         {
-            //todo: _bus.publish() OvertimeReturn ex.Message.ToDecimal
+            if (Decimal.TryParse(ex.Message, out decimal penalty))
+            {
+                var overtimeReturn = new OvertimeReturn() { UserId = customerId, AmountToPay = penalty };
+                await _messagePublisher.Publish(overtimeReturn);
+            }
         }
 
         await _bookRepository.UpdateAsync(book);
-        //_bus.Publish()
-    }
+        var availabilityChanged = new BookAvailabilityChanged() { BookId = bookId, Amount = 1 };
+        await _messagePublisher.Publish(availabilityChanged);
 
-
-    private async Task<Book> GetBookOrThrow(int id)
-    {
-        var book = await _bookRepository.GetAsync(id);
-        if (book is null)
-            throw new EntityNotFoundException("Book has not been found");
-
-        return book;
-    }
-
-    private async Task<Customer> GetCustomerOrThrow(string id)
-    {
-        var user = await _customerRepository.GetAsync(id);
-        if (user is null)
-            throw new EntityNotFoundException("Customer has not been found");
-
-        return user;
     }
 }

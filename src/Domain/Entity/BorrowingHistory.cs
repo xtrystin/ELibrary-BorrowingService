@@ -31,6 +31,14 @@ public class BorrowingHistory
 
 
     public bool IsOverTimeReturn() => _borrowedDate.AddDays(Book.MaxBorrowDays) > DateTime.Now;
+    public int GetOverTimeDays()
+    {
+        if (IsOverTimeReturn() is false)
+            return 0;
+        
+        var overtimeDays = DateTime.Now.Subtract(_borrowedDate.AddDays(Book.MaxBorrowDays)).Days;
+        return overtimeDays;
+    }
 
     public void Return()
     {
