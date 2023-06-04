@@ -19,10 +19,13 @@ internal class BookEntityTypeConfig : IEntityTypeConfiguration<Book>
 
         builder.Property<decimal>("_penaltyAmount")
             .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasDefaultValue(0.1)
             .HasColumnName("PenaltyAmount");
 
-        builder.Property(x => x.MaxBookingDays);
+        builder.Property(x => x.MaxBookingDays)
+            .HasDefaultValue(15);
 
-        builder.Property(x => x.MaxBorrowDays);
+        builder.Property(x => x.MaxBorrowDays)
+            .HasDefaultValue(30);
     }
 }
