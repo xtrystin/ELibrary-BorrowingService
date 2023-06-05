@@ -10,8 +10,8 @@ public class Book
     public int MaxBorrowDays { get; private set; }
     public int MaxBookingDays { get; private set; }
 
-    private List<BorrowingHistory> _borrowingHistory;
-    private List<BookingHistory> _bookingHistory;
+    private List<BorrowingHistory> _borrowingHistory = new();
+    private List<BookingHistory> _bookingHistory = new();
 
     public IReadOnlyCollection<BookingHistory> BookingHistory => _bookingHistory;
     public IReadOnlyCollection<BorrowingHistory> BorrowingHistory => _borrowingHistory;
@@ -29,10 +29,13 @@ public class Book
 
     public void Borrow(BorrowingHistory borrowing)
     {
+        if (_borrowingHistory.Any(x => x.CustomerId == borrowing.CustomerId && x.IsReturned() is false))
+            throw new System.Exception("You have already borrowed this book");
+
         var activeBooking = _bookingHistory.FirstOrDefault(x => x.IsActive());
         if (activeBooking is not null)
         {
-            borrowing.Customer.Borrow();
+            borrowing.Customer.Borrow(borrowAfterBooking: true);
             activeBooking.Unbook(unBookAfterBorrow: true);
             _borrowingHistory.Add(borrowing);
 
@@ -44,7 +47,7 @@ public class Book
         }
         else
         {
-            borrowing.Customer.Borrow();
+            borrowing.Customer.Borrow(borrowAfterBooking: false);
             _availabieBooks--;
             _borrowingHistory.Add(borrowing);
         }
@@ -53,8 +56,7 @@ public class Book
 
     public void Return(string customerId) 
     {
-        var borrowing = _borrowingHistory.FirstOrDefault(x => x.CustomerId == customerId
-            && x.IsReturned() is false);
+        var borrowing = _borrowingHistory.FirstOrDefault(x => x.CustomerId == customerId && x.IsReturned() is false);
         if (borrowing is null)
             throw new NoItemException($"Book {Id} does not have this borrowing entry");
 
@@ -72,6 +74,9 @@ public class Book
 
     public void BookBook(BookingHistory booking)
     {
+        if (_bookingHistory.Any(x => x.BookId == this.Id && x.IsActive()))
+            throw new System.Exception("You have already booked this book");
+
         if (_availabieBooks <= 0)
             throw new BookNotAvailableException(Id);
 
@@ -82,8 +87,7 @@ public class Book
 
     public void UnBook(string customerId) 
     {
-        var booking = _bookingHistory.FirstOrDefault(x => x.CustomerId == customerId
-            && x.IsActive());
+        var booking = _bookingHistory.FirstOrDefault(x => x.CustomerId == customerId && x.IsActive());
         if (booking is null)
             throw new NoItemException($"Book {Id} does not have this booking entry");
 

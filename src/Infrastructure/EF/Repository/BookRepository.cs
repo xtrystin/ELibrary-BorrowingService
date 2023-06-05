@@ -10,5 +10,7 @@ public class BookRepository : EntityRepository<Book, int>, IBookRepository
     }
 
     public override async Task<Book?> GetAsync(int id)
-        => await _dbContext.Books.FirstOrDefaultAsync(x => x.Id == id);
+        => await _dbContext.Books.Include(x => x.BorrowingHistory).ThenInclude(x => x.Customer)
+            .Include(x => x.BookingHistory).ThenInclude(x => x.Customer)
+            .FirstOrDefaultAsync(x => x.Id == id);
 }

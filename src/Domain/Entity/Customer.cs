@@ -31,17 +31,20 @@ public class Customer
 
     public void Book()
     {
-        if (_isAccountBlocked is false && _currentBookedBookNr < _maxBooksToBook)
+        if (_isAccountBlocked is true && _currentBookedBookNr < _maxBooksToBook)
             throw new TooManyBooksException("You cannot book more books");
         _currentBookedBookNr++;
     }
     public void UnBook() => _currentBookedBookNr--;
 
-    public void Borrow()
+    public void Borrow(bool borrowAfterBooking)
     {
-        if(_isAccountBlocked is false && _currentBorrowedBookNr < _maxBooksToBorrow)
+        if(_isAccountBlocked is true && _currentBorrowedBookNr < _maxBooksToBorrow)
             throw new TooManyBooksException("You cannot book more books");
         _currentBorrowedBookNr++;
+
+        if (borrowAfterBooking)
+            _currentBookedBookNr--;
     }
     public void Return() => _currentBorrowedBookNr--;
 

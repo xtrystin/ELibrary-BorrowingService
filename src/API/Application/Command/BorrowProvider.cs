@@ -2,6 +2,7 @@
 using ELibrary_BorrowingService.Domain.Entity;
 using ELibrary_BorrowingService.Domain.Exception;
 using ELibrary_BorrowingService.Domain.Repository;
+using ELibrary_BorrowingService.Infrastructure.EF.Repository;
 using ELibrary_BorrowingService.ServiceBus;
 using ServiceBusMessages;
 
@@ -12,13 +13,15 @@ public class BorrowProvider : IBorrowProvider
     private readonly IBookRepository _bookRepository;
     private readonly ICommonHelpers _commonHelpers;
     private readonly IMessagePublisher _messagePublisher;
+    private readonly ICustomerRepository _customerRepository;
 
     public BorrowProvider(IBookRepository bookRepository, ICommonHelpers commonHelpers,
-        IMessagePublisher messagePublisher)
+        IMessagePublisher messagePublisher, ICustomerRepository customerRepository)
     {
         _bookRepository = bookRepository;
         _commonHelpers = commonHelpers;
         _messagePublisher = messagePublisher;
+        _customerRepository = customerRepository;
     }
 
     public async Task Borrow(int bookId, string customerId)
@@ -38,6 +41,8 @@ public class BorrowProvider : IBorrowProvider
         }
 
         await _bookRepository.UpdateAsync(book);
+        await _customerRepository.UpdateAsync(user);
+
         var availabilityChanged = new BookAvailabilityChanged() { BookId = bookId, Amount = -1 };
         await _messagePublisher.Publish(availabilityChanged);
     }
@@ -59,6 +64,8 @@ public class BorrowProvider : IBorrowProvider
         }
 
         await _bookRepository.UpdateAsync(book);
+        await _customerRepository.UpdateAsync(await _customerRepository.GetAsync(customerId));
+
         var availabilityChanged = new BookAvailabilityChanged() { BookId = bookId, Amount = 1 };
         await _messagePublisher.Publish(availabilityChanged);
 

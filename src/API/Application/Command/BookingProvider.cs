@@ -11,13 +11,15 @@ public class BookingProvider : IBookingProvider
     private readonly IBookRepository _bookRepository;
     private readonly ICommonHelpers _commonHelpers;
     private readonly IMessagePublisher _messagePublisher;
+    private readonly ICustomerRepository _customerRepository;
 
     public BookingProvider(IBookRepository bookRepository, ICommonHelpers commonHelpers,
-        IMessagePublisher messagePublisher)
+        IMessagePublisher messagePublisher, ICustomerRepository customerRepository)
     {
         _bookRepository = bookRepository;
         _commonHelpers = commonHelpers;
         _messagePublisher = messagePublisher;
+        _customerRepository = customerRepository;
     }
 
     public async Task Book(int bookId, string customerId)
@@ -29,6 +31,8 @@ public class BookingProvider : IBookingProvider
         book.BookBook(booking);
 
         await _bookRepository.UpdateAsync(book);
+        await _customerRepository.UpdateAsync(user);
+
         var availabilityChanged = new BookAvailabilityChanged() { BookId = bookId, Amount = -1 };
         await _messagePublisher.Publish(availabilityChanged);
     }
@@ -39,6 +43,8 @@ public class BookingProvider : IBookingProvider
         book.UnBook(customerId);
 
         await _bookRepository.UpdateAsync(book);
+        await _customerRepository.UpdateAsync(await _customerRepository.GetAsync(customerId));
+
         var availabilityChanged = new BookAvailabilityChanged() { BookId = bookId, Amount = 1 };
         await _messagePublisher.Publish(availabilityChanged);
     }

@@ -20,7 +20,7 @@ public class BorrowingHistory
 
     public BorrowingHistory(Book book, Customer customer)
     {
-        _borrowedDate = DateTime.Now;
+        _borrowedDate = DateTime.UtcNow;
         _returnedDate = null;
 
         Book = book;
@@ -30,7 +30,7 @@ public class BorrowingHistory
     }
 
 
-    public bool IsOverTimeReturn() => _borrowedDate.AddDays(Book.MaxBorrowDays) > DateTime.Now;
+    public bool IsOverTimeReturn() => _borrowedDate.AddDays(Book.MaxBorrowDays) < DateTime.Now;
     public int GetOverTimeDays()
     {
         if (IsOverTimeReturn() is false)
@@ -45,7 +45,7 @@ public class BorrowingHistory
         if (IsReturned())
             throw new System.Exception($"Book {BookId} has been already returned");
         
-        _returnedDate = DateTime.Now;
+        _returnedDate = DateTime.UtcNow;
     }
 
     public bool IsReturned() => _returnedDate is not null;

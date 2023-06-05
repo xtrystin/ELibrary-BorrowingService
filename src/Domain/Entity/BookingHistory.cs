@@ -19,7 +19,7 @@ public class BookingHistory
 
     public BookingHistory(Book book, Customer customer)
     {
-        _bookingDate = DateTime.Now;
+        _bookingDate = DateTime.UtcNow;
         _isSuccessful = null;
 
         _bookingLimitDate = _bookingDate.AddDays(book.MaxBookingDays);
