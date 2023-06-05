@@ -16,7 +16,7 @@ public class BookingController : ControllerBase
         _bookingProvider = bookingProvider;
     }
 
-    [HttpPost("bookId")]
+    [HttpPost("{bookId}")]
     [ProducesResponseType(400, Type = typeof(string))]
     [ProducesResponseType(401, Type = typeof(string))]
     [ProducesResponseType(403, Type = typeof(string))]
@@ -27,7 +27,7 @@ public class BookingController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("Return/bookId")]
+    [HttpPost("Return/{bookId}")]
     [ProducesResponseType(400, Type = typeof(string))]
     [ProducesResponseType(401, Type = typeof(string))]
     [ProducesResponseType(403, Type = typeof(string))]

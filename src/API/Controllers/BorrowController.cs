@@ -17,7 +17,7 @@ public class BorrowController : ControllerBase
         _borrowProvider = borrowProvider;
     }
 
-    [HttpPost("bookId")]
+    [HttpPost("{bookId}")]
     [Authorize(Roles = "admin, employee")]
     [ProducesResponseType(400, Type = typeof(string))]
     [ProducesResponseType(401, Type = typeof(string))]
@@ -29,7 +29,7 @@ public class BorrowController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("Return/bookId")]
+    [HttpPost("Return/{bookId}")]
     [Authorize(Roles = "admin, employee")]
     [ProducesResponseType(400, Type = typeof(string))]
     [ProducesResponseType(401, Type = typeof(string))]
