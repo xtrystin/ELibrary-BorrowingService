@@ -115,7 +115,7 @@ namespace ELibrary_BorrowingService.RabbitMq
                         {
                             e.ConfigureConsumeTopology = false;     // configuration for ASB Basic Tier - queues only
                             e.PublishFaults = false;
-                            e.ConfigureConsumer<UserBlockedBrConsumer>(context);
+                            e.ConfigureConsumer<UserUnblockedBrConsumer>(context);
 
                         });
 
