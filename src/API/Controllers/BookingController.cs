@@ -67,12 +67,12 @@ public class BookingController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("Return/{bookId}")]
+    [HttpPost("UnBook/{bookId}")]
     [ProducesResponseType(400, Type = typeof(string))]
     [ProducesResponseType(401, Type = typeof(string))]
     [ProducesResponseType(403, Type = typeof(string))]
     [ProducesResponseType(204)]
-    public async Task<ActionResult> Return([FromRoute] int bookId, [FromBody] CustomerId customerId)
+    public async Task<ActionResult> UnBook([FromRoute] int bookId, [FromBody] CustomerId customerId)
     {
         await _bookingProvider.UnBook(bookId, customerId.customerId);
         return NoContent();

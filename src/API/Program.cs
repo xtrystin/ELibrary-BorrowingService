@@ -2,6 +2,7 @@ using ELibrary_BorrowingService.RabbitMq;
 using ELibrary_BorrowingService.Application;
 using ELibrary_BorrowingService.Extensions;
 using ELibrary_BorrowingService.Infrastructure.EF;
+using ELibrary_BorrowingService.Jobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,7 @@ builder.Services.AddPostgres(builder.Configuration);
 builder.Services.AddServiceBus(builder.Configuration);
 
 builder.Services.AddProviderCollection();
+builder.Services.AddQuartzJobs(builder.Configuration);
 
 var app = builder.Build();
 

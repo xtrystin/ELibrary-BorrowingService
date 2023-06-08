@@ -40,6 +40,4 @@ public class BookingHistory
     }
 
     public bool IsActive() => _isActive;
-
-    public bool IsLimitDateExceeded(DateTime date) => _bookingLimitDate < date;
 }

@@ -16,5 +16,16 @@ public class BookingHistoryRepository : EntityRepository<BookingHistory, int>, I
         => await _dbContext.BookingHistory.FirstOrDefaultAsync(x => x.Id == id);
 
     public async Task<List<BookingHistory>> GetWithExceededDate(DateTime date)
-        => await _dbContext.BookingHistory.Where(x => x.IsLimitDateExceeded(date)).ToListAsync();
+    {
+        return await _dbContext.BookingHistory.FromSql($@"select *
+            from ""borrowingService"".""BookingHistory"" bh 
+            where bh.""IsActive"" = true and bh.""BookingLimitDate"" < now()")
+            .ToListAsync();
+    }
+
+    public async Task UpdateRangeAsync(List<BookingHistory> entities)
+    {
+        _dbContext.UpdateRange(entities);
+        await _dbContext.SaveChangesAsync();
+    }
 }
