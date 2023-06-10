@@ -17,7 +17,7 @@ public class UserUnblockedConsumer : IConsumer<UserUnblocked>
         var customer = await _customerRepository.GetAsync(context.Message.UserId);
         if (customer is not null)
         {
-            customer.ChangeAccountStatus(isAccountBlocked: true);
+            customer.ChangeAccountStatus(isAccountBlocked: false);
             await _customerRepository.UpdateAsync(customer);
         }
     }
@@ -36,7 +36,7 @@ public class UserUnblockedBrConsumer : IConsumer<UserUnblockedBr>
         var customer = await _customerRepository.GetAsync(context.Message.UserId);
         if (customer is not null)
         {
-            customer.ChangeAccountStatus(isAccountBlocked: true);
+            customer.ChangeAccountStatus(isAccountBlocked: false);
             await _customerRepository.UpdateAsync(customer);
         }
     }
