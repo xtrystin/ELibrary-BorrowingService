@@ -18,7 +18,7 @@ public class UserDeletedConsumer : IConsumer<UserDeleted>
         if (customer is not null) 
         {
             customer.DeleteCustomer();
-            _customerRepository.UpdateAsync(customer);
+            await _customerRepository.UpdateAsync(customer);
         }
     }
 }
@@ -37,7 +37,7 @@ public class UserDeletedBrConsumer : IConsumer<UserDeletedBr>
         if (customer is not null) 
         {
             customer.DeleteCustomer();
-            _customerRepository.UpdateAsync(customer);
+            await _customerRepository.UpdateAsync(customer);
         }
     }
 }

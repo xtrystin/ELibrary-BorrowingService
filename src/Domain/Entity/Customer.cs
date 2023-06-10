@@ -51,5 +51,9 @@ public class Customer
     public void ChangeAccountStatus(bool isAccountBlocked) 
         => _isAccountBlocked = isAccountBlocked;
 
-    public void DeleteCustomer() => (_maxBooksToBook, _maxBooksToBorrow) = (-1, -1);
+    public void DeleteCustomer()
+    {
+        (_maxBooksToBook, _maxBooksToBorrow) = (-1, -1);
+        _isAccountBlocked = true;
+    }
 }

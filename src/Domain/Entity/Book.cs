@@ -1,5 +1,4 @@
 ﻿using ELibrary_BorrowingService.Domain.Exception;
-using static System.Reflection.Metadata.BlobBuilder;
 
 namespace ELibrary_BorrowingService.Domain.Entity;
 public class Book
