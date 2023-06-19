@@ -23,13 +23,31 @@ todo
 
 ### System Architecture
 ![Pasted image 20230526225129](https://github.com/xtrystin/ELibrary-BorrowingService/assets/33805319/a04fa4c1-e140-4d82-bc4c-219c33530d91)
+
+_Updated system architecture_
+![Pasted image 20230612235536](https://github.com/xtrystin/ELibrary-BorrowingService/assets/33805319/02016500-b74b-4f53-a28e-680155deadc8)
+
 ### Class Diagram
 ![Diagram_klas](https://github.com/xtrystin/ELibrary-BorrowingService/assets/33805319/48fe1ba0-6ad4-4bb0-8aa5-31ceb91876f8)
+
+_Final class diagrams_
+1. BorrowingService
+![borrowingServiceWithoutWatermark](https://github.com/xtrystin/ELibrary-BorrowingService/assets/33805319/f4444033-4ad7-4b3b-ae1e-21390f18b657)
+
+2. BookService
+![BookServiceWithoutWatermark](https://github.com/xtrystin/ELibrary-BorrowingService/assets/33805319/b7ef52ba-9594-423f-b343-6d72af09dcd3)
+
+3. UserService
+![userServiceWithoutWatermark](https://github.com/xtrystin/ELibrary-BorrowingService/assets/33805319/039ce2af-0dc1-4c58-99f8-a13ba952ff99)
+
 
 ### Services Description
 
 
 #### Service Architecture
+_Component diagram_
+![Pasted image 20230612235951](https://github.com/xtrystin/ELibrary-BorrowingService/assets/33805319/760f0a6a-9b5f-4410-9067-e8a6c348172e)
+
 ![Pasted image 20230603203510](https://github.com/xtrystin/ELibrary-BorrowingService/assets/33805319/155b42b9-075f-49f3-8214-c9727071f860)
 
 #### Command Query Separation
@@ -39,10 +57,14 @@ todo
 ![Pasted image 20230515214353](https://github.com/xtrystin/ELibrary-BorrowingService/assets/33805319/6d70f89a-8cf2-4c42-b5dd-c1db4330b1c3)
 
 #### Error Handling
+- custom exception are catched in a first in request pipeline middleware and mapped to appropriate http status code
 
 #### API Middlewares
+- ErrorHandler -> httpsRedirection -> Cors Policy -> authentication -> authorization -> endpoint routing
 
 #### JWT Authorization
+- AuthService generates token for react app
+- token is validated in each service
 
 #### Database - PostGresql
 - Code First using ORM - Entity Framework
@@ -51,6 +73,7 @@ todo
 - Migrations are stored in each service in directory *Migrations*
 
 #### Unit Tests
+- NUnit Framework
 
 #### Jobs
 - Quartz library
@@ -75,10 +98,10 @@ todo
 
 #### Diagram
 
-todo - update diagram based on table
+todo - update diagram based on messages table
 ![Pasted image 20230526225225](https://github.com/xtrystin/ELibrary-BorrowingService/assets/33805319/c9f10fb2-ebdf-44a1-9c81-c6b71bb99564)
 
-#### Messages Description
+#### Messages Table
 
 | Message  |  Publishers | Subscribers | Description |
 |---|---|---|---|
