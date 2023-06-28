@@ -3,6 +3,7 @@ using ELibrary_BorrowingService.Application;
 using ELibrary_BorrowingService.Extensions;
 using ELibrary_BorrowingService.Infrastructure.EF;
 using ELibrary_BorrowingService.Jobs;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,5 +37,8 @@ app.UseCors("OpenCorsPolicy");
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMetricServer();
+app.UseHttpMetrics(options => options.AddCustomLabel("host", context => context.Request.Host.Host));
 
 app.Run();
