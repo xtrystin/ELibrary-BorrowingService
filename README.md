@@ -4,10 +4,10 @@ This service is part of **ELibrary Project** - to read more please scroll down
 ## ELibrary Project
 
 ### Live  Preview
-https://jonaszor.github.io/eBiblioteka
+https://elibrarypk-76b898964c75.herokuapp.com/
 
-### Walk-through Video
-todo
+### User Manual
+[UserManual.md](/docs/usermanual.md)
 
 ### Services Overview
 
@@ -18,8 +18,9 @@ todo
 |  AuthService | [AuthService](https://github.com/xtrystin/ELibrary-AuthService)  | Register, Add to Role, Login - JWT generation  |
 |  ApiGateway | [ApiGateway](https://github.com/xtrystin/ELibrary-ApiGateway)  | public gateway for frontend app to services in VPN   |
 |  BorrowingService | [BorrowingService](https://github.com/xtrystin/ELibrary-BorrowingService)   | Borrow, Book a book   |
+|  NewsService      | [NewsService](https://github.com/mateusztoczek/ELibrary-NewsService)        | Manage news           |
 | K8sScripts  | [ELibraryK8s](https://github.com/DyremiX/Elibrary_k8s)  | Kubernetes scripts  |
-| Frontend  | [ELibraryFront](https://github.com/Kotruper/eBiblioteka_v2)  | React frontend app  |
+| Frontend  | [ELibraryFront](https://github.com/jonaszor/eBiblioteka)  | React frontend app  |
 
 ### System Architecture
 ![Pasted image 20230526225129](https://github.com/xtrystin/ELibrary-BorrowingService/assets/33805319/a04fa4c1-e140-4d82-bc4c-219c33530d91)
